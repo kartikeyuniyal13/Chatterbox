@@ -1,0 +1,11 @@
+{
+    "cmake.configureSettings": {
+
+    },
+    "workbench.colorCustomizations": {
+    "editorCursor.background": "#f0f9ff",
+    "editorCursor.foreground": "#0284c7",
+    "editorError.foreground": "#dc2626",
+    "editorWarning.foreground": "#ca8a04"
+},
+}
