@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { IconType, Icons } from '@/components/Icons'
 import FriendRequestSidebarOptions from '@/components/FriendRequestSidebarOptions'
 import { fetchRedis } from '@/helper/redis'
+import { getFriendById } from '@/helper/getFriend'
+import SidebarChatList from '@/components/SidebarChatList'
 
 interface LayoutProps {
   children: ReactNode
@@ -33,6 +35,8 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
     console.log('no session')
     return <div>No session</div>
   }
+
+  const friends=await getFriendById(session.user.id)
   
   const unseenRequestCount=(await fetchRedis('smembers',`user:${session.user.id}:incoming_friend_requests`) as User[]).length
 
@@ -43,10 +47,23 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
         <Link href='/dashboard' className='flex h-16 shrink-0 items-center'>
           <Icons.Logo className='h-8 w-auto text-indigo-600' />
         </Link>
-        <div className='text-xs font-semibold leading-6 text-gray-400'>
-          Your Chats
-        </div>
-        <nav className='flex flex-1 flex-col gap-y-7'>
+        
+        {
+          friends.length>0?(<div className='text-xs font-semibold leading-6 text-gray-400'>
+            Your Chats
+          </div>):null  
+        }
+        <nav className='flex flex-1 flex-col '>
+
+          <ul role='list' className='flex flex-1 flex-col gap-y-7'>
+            <li>
+              <SidebarChatList sessionId={session.user.id} friends={friends}/>
+            </li>
+
+
+
+
+
           <ul role='list' className='-mx-2 mt-2 space-y-1'>
             {sidebarOptions.map((option) => {
               const Icon = Icons[option.Icon]

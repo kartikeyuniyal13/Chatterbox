@@ -59,7 +59,7 @@ export async function POST(req: Request) {
 
 
     await db.sadd(`user:${idToAdd}:incoming_friend_requests`, session.user.id)
-
+    //mandatory to send response
     return new Response('OK')
   } catch (error) {
     if (error instanceof z.ZodError) {
