@@ -89,6 +89,7 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
                   />
             </li>
           </ul>
+          </ul>
         </nav>
       </div>
       <div className='flex-1'>{children}</div>

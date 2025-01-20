@@ -1,5 +1,5 @@
 
-import Providers from "@/components/Provider";
+import Providers from "../components/Provider";
 import "./globals.css";
 
 

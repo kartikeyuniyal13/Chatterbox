@@ -18,7 +18,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.408.0",
-    "nanoid": "^5.0.7",
+    "nanoid": "^5.0.9",
     "next": "14.2.5",
     "next-auth": "^4.24.7",
     "pusher": "^5.2.0",

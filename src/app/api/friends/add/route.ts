@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         status: 400,
       })
     }
-
+     //get is by default cacheable in redis so we are creating a function viz fetchRedis to fetch data from redis with no cache because we want to get the latest data
     // check if user is already added
     const isAlreadyAdded = (await fetchRedis(
       'sismember',
