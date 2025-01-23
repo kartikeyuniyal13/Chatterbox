@@ -5,6 +5,8 @@ import { nanoid } from "nanoid"
 import { Message, messageSchema } from "@/lib/validations/message"
 import { db } from "@/lib/db"
 import { z } from "zod"
+import { pusherServer } from "@/lib/pusher"
+import { toPusherKey } from "@/lib/utils"
 
 //we automatically get the request object from the server
 export async function POST(req:Request){
@@ -41,9 +43,36 @@ export async function POST(req:Request){
         senderId:session.user.id,
         text,
         timestamp
-
      }
+     
      const message=messageSchema.parse(messageData)
+
+     pusherServer.trigger(
+        toPusherKey(`chat:${chatId}`),
+        'incoming-message',
+        message
+     )
+
+     const rawSender = (await fetchRedis(
+        "get",
+        `user:${session.user.id}`
+     )) as string;
+     const sender = JSON.parse(rawSender) as User;
+
+     try {
+        pusherServer.trigger(
+          toPusherKey(`user:${chatPartnerId}:chats`),
+          "new_message",
+          { ...message, senderImage: sender.image, senderName: sender.name }
+        );
+        console.error('Pusher trigger', { ...message, senderImage: sender.image, senderName: sender.name },
+            toPusherKey(`user:${chatPartnerId}:chats`)
+        );
+      } catch (error) {
+        console.error('Pusher trigger error:', error);
+      }
+
+     
      await db.zadd(
             `chat:${chatId}:messages`,
             { score: timestamp, member: JSON.stringify(message) }

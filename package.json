@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
     "@hookform/resolvers": "^3.9.0",
     "@next-auth/upstash-redis-adapter": "^3.0.4",
     "@tailwindcss/forms": "^0.5.7",
@@ -17,6 +18,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+    "encoding": "^0.1.13",
     "lucide-react": "^0.408.0",
     "nanoid": "^5.0.9",
     "next": "14.2.5",
@@ -27,6 +29,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.52.1",
     "react-hot-toast": "^2.4.1",
+    "react-loading-skeleton": "^3.5.0",
     "react-textarea-autosize": "^8.5.3",
     "tailwind-merge": "^2.4.0",
     "zod": "^3.23.8"

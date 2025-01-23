@@ -17,7 +17,10 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
   const [input, setInput] = useState<string>('')
 
   const sendMessage = async () => {
-    if(!input) return
+    if(!input) {
+      toast.error('Empty message.Enter a message to send.')
+      return
+    }
     setIsLoading(true)
 
     try {

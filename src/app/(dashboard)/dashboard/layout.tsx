@@ -3,22 +3,18 @@ import { getServerSession } from 'next-auth'
 import { notFound } from 'next/navigation'
 import { FC, ReactNode } from 'react'
 import Link from 'next/link'
-import { IconType, Icons } from '@/components/Icons'
+import { Icons } from '@/components/Icons'
 import FriendRequestSidebarOptions from '@/components/FriendRequestSidebarOptions'
 import { fetchRedis } from '@/helper/redis'
 import { getFriendById } from '@/helper/getFriend'
 import SidebarChatList from '@/components/SidebarChatList'
-
+import Image from 'next/image'
+import SignOutButton from '@/components/SignOutButton'
+import MobileChatLayout from '@/components/MobileChatLayout'
 interface LayoutProps {
   children: ReactNode
 }
 
-interface SidebarOption {
-  id: number
-  name: string
-  Icon: IconType
-  href: string
-}
 
 const sidebarOptions: SidebarOption[] = [
   {
@@ -42,7 +38,15 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
 
 
   return (
-    <div className='w-full flex h-screen'>
+    <div className='w-full mx-1 flex h-screen'>
+      <div className='md:hidden'>
+          <MobileChatLayout
+               friends={friends}
+               session={session}
+               sidebarOptions={sidebarOptions}
+               unseenRequestCount={unseenRequestCount}
+             />
+      </div>
       <div className='hidden md:flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-wh'>
         <Link href='/dashboard' className='flex h-16 shrink-0 items-center'>
           <Icons.Logo className='h-8 w-auto text-indigo-600' />
@@ -55,7 +59,7 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
         }
         <nav className='flex flex-1 flex-col '>
 
-          <ul role='list' className='flex flex-1 flex-col gap-y-7'>
+          <ul className='flex flex-1 flex-col gap-y-7'>
             <li>
               <SidebarChatList sessionId={session.user.id} friends={friends}/>
             </li>
@@ -64,9 +68,9 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
 
 
 
-          <ul role='list' className='-mx-2 mt-2 space-y-1'>
+          <ul className='-mx-2 mt-2 space-y-1'>
             {sidebarOptions.map((option) => {
-              const Icon = Icons[option.Icon]
+              const Icon = Icons[option.Icon as keyof typeof Icons]
               return (
                 <li key={option.id}>
                   <Link
@@ -89,12 +93,41 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
                   />
             </li>
           </ul>
-          </ul>
-        </nav>
+          
+           {/* TODO user information */}
+           <li className="-mx-2 mt-auto flex items-center">
+                     <div className="flex flex-1 items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900">
+                        <div className="relative h-8 w-8 bg-gray-50">
+                           <Image
+                              fill
+                              referrerPolicy="no-referrer"
+                              className="rounded-full"
+                              src={session.user.image || ""}
+                              alt="Your profile image"
+                           />
+                        </div>
+
+                        <span className="sr-only">Your Profile</span>
+                        <div className="flex flex-col">
+                           <span aria-hidden="true">{session.user.name}</span>
+                           <span
+                              className="text-xs text-zinc-400"
+                              aria-hidden="true"
+                           >
+                              {session.user.email}
+                           </span>
+                        </div>
+                     </div>
+                     <SignOutButton className='h-full aspect-square'/>
+                  </li>
+               </ul>
+            </nav>
+         </div>
+         <aside className='max-h-screen container py-16 md:py-12 w-full'>
+         {children}
+      </aside>
       </div>
-      <div className='flex-1'>{children}</div>
-    </div>
-  )
-}
+   );
+};
 
 export default Layout

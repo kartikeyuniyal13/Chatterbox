@@ -17,5 +17,8 @@ export function chatHrefConstructor(id1: string, id2: string) {
 }
 
 export function toPusherKey(key: string) {
+  if (typeof key !== 'string' || key.trim() === '') {
+    throw new Error('Invalid key: Key must be a non-empty string.');
+  }
   return key.replace(/:/g, '__')
 }
