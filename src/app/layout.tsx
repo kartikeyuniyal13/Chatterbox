@@ -1,6 +1,7 @@
 
 import Providers from "../components/Provider";
 import "./globals.css";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 
 
@@ -13,6 +14,7 @@ export default function RootLayout({
     <html lang="en">
       <body >
         <Providers>{children}
+        <SpeedInsights />
           </Providers></body>
     </html>
   );
