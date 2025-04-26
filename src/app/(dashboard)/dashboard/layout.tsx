@@ -11,10 +11,10 @@ import SidebarChatList from '@/components/SidebarChatList'
 import Image from 'next/image'
 import SignOutButton from '@/components/SignOutButton'
 import MobileChatLayout from '@/components/MobileChatLayout'
+
 interface LayoutProps {
   children: ReactNode
 }
-
 
 const sidebarOptions: SidebarOption[] = [
   {
@@ -32,102 +32,108 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
     return <div>No session</div>
   }
 
-  const friends=await getFriendById(session.user.id)
-  
-  const unseenRequestCount=(await fetchRedis('smembers',`user:${session.user.id}:incoming_friend_requests`) as User[]).length
+  const friends = await getFriendById(session.user.id)
 
+  const unseenRequestCount = (await fetchRedis('smembers', `user:${session.user.id}:incoming_friend_requests`) as User[]).length
 
   return (
-    <div className='w-full mx-1 flex h-screen'>
+    <div className='w-full mx-1 flex h-screen bg-gradient-to-br from-teal-50 to-teal-100'>
       <div className='md:hidden'>
-          <MobileChatLayout
-               friends={friends}
-               session={session}
-               sidebarOptions={sidebarOptions}
-               unseenRequestCount={unseenRequestCount}
-             />
+        <MobileChatLayout
+          friends={friends}
+          session={session}
+          sidebarOptions={sidebarOptions}
+          unseenRequestCount={unseenRequestCount}
+        />
       </div>
-      <div className='hidden md:flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-wh'>
-        <Link href='/dashboard' className='flex h-16 shrink-0 items-center'>
-          <Icons.Logo className='h-8 w-auto text-indigo-600' />
+
+      <div className='hidden md:flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white'>
+        {/* Logo */}
+        <Link href='/dashboard' className='flex h-16 shrink-0 items-center px-4'>
+          <span className='text-2xl font-bold text-black tracking-wide'>
+            Chatterbox
+          </span>
+          <Icons.Logo className='h-8 w-auto text-teal-600 ml-2' />
         </Link>
-        
-        {
-          friends.length>0?(<div className='text-xs font-semibold leading-6 text-gray-400'>
-            Your Chats
-          </div>):null  
-        }
-        <nav className='flex flex-1 flex-col '>
 
-          <ul className='flex flex-1 flex-col gap-y-7'>
-            <li>
-              <SidebarChatList sessionId={session.user.id} friends={friends}/>
-            </li>
+        {/* Chats Section */}
+        <div className="flex flex-col flex-1">
+          {friends.length > 0 && (
+            <div className="px-4 py-2 text-sm font-semibold text-teal-700 uppercase tracking-wider">
+              Your Chats
+            </div>
+          )}
 
+          <nav className='flex flex-1 flex-col px-2'>
+            <ul className='flex flex-1 flex-col gap-y-5'>
+              {/* Sidebar Chat List */}
+              <li>
+                <SidebarChatList sessionId={session.user.id} friends={friends} />
+              </li>
 
+              {/* Sidebar Options (Add Friend etc.) */}
+              <ul className='-mx-2 mt-4 space-y-2'>
+                {sidebarOptions.map((option) => {
+                  const Icon = Icons[option.Icon as keyof typeof Icons];
+                  return (
+                    <li key={option.id}>
+                      <Link
+                        href={option.href}
+                        className='group flex items-center gap-3 rounded-md p-2 text-sm font-semibold text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition'
+                      >
+                        <span className='flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-teal-600 group-hover:border-teal-700 group-hover:bg-teal-100'>
+                          <Icon className='h-5 w-5' />
+                        </span>
+                        {option.name}
+                      </Link>
+                    </li>
+                  )
+                })}
 
-
-
-          <ul className='-mx-2 mt-2 space-y-1'>
-            {sidebarOptions.map((option) => {
-              const Icon = Icons[option.Icon as keyof typeof Icons]
-              return (
-                <li key={option.id}>
-                  <Link
-                    href={option.href}
-                    className='text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                  >
-                    <span className='text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white'>
-                      <Icon className='h-4 w-4' />
-                    </span>
-                    <span className='truncate'>{option.name}</span>
-                  </Link>
-                </li>
-              )
-            })}
-
-            <li>
-            <FriendRequestSidebarOptions
+                {/* Friend Requests */}
+                <li>
+                  <FriendRequestSidebarOptions
                     sessionId={session.user.id}
                     initialUnseenRequestCount={unseenRequestCount}
                   />
-            </li>
-          </ul>
-          
-           {/* TODO user information */}
-           <li className="-mx-2 mt-auto flex items-center">
-                     <div className="flex flex-1 items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900">
-                        <div className="relative h-8 w-8 bg-gray-50">
-                           <Image
-                              fill
-                              referrerPolicy="no-referrer"
-                              className="rounded-full"
-                              src={session.user.image || ""}
-                              alt="Your profile image"
-                           />
-                        </div>
+                </li>
+              </ul>
 
-                        <span className="sr-only">Your Profile</span>
-                        <div className="flex flex-col">
-                           <span aria-hidden="true">{session.user.name}</span>
-                           <span
-                              className="text-xs text-zinc-400"
-                              aria-hidden="true"
-                           >
-                              {session.user.email}
-                           </span>
-                        </div>
-                     </div>
-                     <SignOutButton className='h-full aspect-square'/>
-                  </li>
-               </ul>
-            </nav>
-         </div>
-         <aside className='max-h-screen container py-16 md:py-12 w-full'>
-         {children}
-      </aside>
+              {/* Profile and Sign Out */}
+              <li className="mt-auto -mx-2 flex items-center bg-teal-50 p-3 rounded-md shadow-sm">
+                <div className="flex items-center gap-x-3 w-full">
+                  <div className="relative h-10 w-10">
+                    <Image
+                      fill
+                      referrerPolicy="no-referrer"
+                      className="rounded-full object-cover"
+                      src={session.user.image || ""}
+                      alt="Your profile image"
+                    />
+                  </div>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="text-sm font-bold text-teal-700 truncate">
+                      {session.user.name}
+                    </span>
+                    <span className="text-xs text-gray-500 truncate">
+                      {session.user.email}
+                    </span>
+                  </div>
+                  <SignOutButton className='ml-auto h-8 w-8' />
+                </div>
+              </li>
+
+            </ul>
+          </nav>
+        </div>
       </div>
-   );
+
+      {/* Main content */}
+      <aside className='max-h-screen container py-16 md:py-12 w-full overflow-y-auto'>
+        {children}
+      </aside>
+    </div>
+  );
 };
 
 export default Layout
